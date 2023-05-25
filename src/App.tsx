@@ -5,9 +5,33 @@ import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Matrix4 } from "three";
+import { PresetsType } from "@react-three/drei/helpers/environment-assets";
+import { useKey } from "react-use";
 import "./App.css";
 import { useQueryParam } from "./useQueryParam";
-import { PresetsType } from "@react-three/drei/helpers/environment-assets";
+
+const supportedEnvironments: PresetsType[] = [
+  "sunset",
+  "dawn",
+  "night",
+  "warehouse",
+  "forest",
+  "apartment",
+  "studio",
+  "city",
+  "park",
+  "lobby",
+];
+
+const supportedModels = ["thomas.glb", "guyman.glb"];
+
+const mod = (n: number, m: number): number => ((n % m) + m) % m;
+
+const previous = (current: string, available: string[]): string =>
+  available[mod(available.indexOf(current) - 1, available.length)];
+
+const next = (current: string, available: string[]): string =>
+  available[mod(available.indexOf(current) + 1, available.length)];
 
 function Helmet({ model }: { model: string }) {
   const gltf = useGLTF(model);
@@ -20,9 +44,27 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker>();
   const [faceTransform, setFaceTransform] = useState<Matrix4>();
+  const defaultModel = useQueryParam("model", "guyman.glb"); // thomas.glb
+  const defaultEnvironment = useQueryParam<PresetsType>("environment", "dawn"); // warehouse
+  const [model, setModel] = useState<string>(defaultModel);
+  const [environment, setEnvironment] =
+    useState<PresetsType>(defaultEnvironment);
 
-  const model = useQueryParam("model", "thomas.glb");
-  const environment = useQueryParam<PresetsType>("environment", "dawn");
+  useKey("ArrowRight", () =>
+    setEnvironment(
+      (environment) => next(environment, supportedEnvironments) as PresetsType
+    )
+  );
+  useKey("ArrowLeft", () =>
+    setEnvironment(
+      (environment) =>
+        previous(environment, supportedEnvironments) as PresetsType
+    )
+  );
+  useKey("ArrowUp", () => setModel((model) => next(model, supportedModels)));
+  useKey("ArrowDown", () =>
+    setModel((model) => previous(model, supportedModels))
+  );
 
   const goFullscreen = (element: HTMLElement) => {
     element.requestFullscreen();
