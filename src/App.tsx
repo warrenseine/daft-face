@@ -1,7 +1,6 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { Environment, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Matrix4 } from "three";
@@ -155,9 +154,6 @@ function App() {
             <Helmet model={model} />
           </group>
         )}
-        <EffectComposer>
-          <Bloom luminanceThreshold={0} luminanceSmoothing={0.7} height={300} />
-        </EffectComposer>
       </Canvas>
     </div>
   );
