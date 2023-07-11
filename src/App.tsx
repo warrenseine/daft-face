@@ -1,7 +1,7 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { Environment, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Matrix4 } from "three";
 import { PresetsType } from "@react-three/drei/helpers/environment-assets";
@@ -58,8 +58,11 @@ function App() {
   const faceLandmarkerRef = useRef<FaceLandmarker>();
   const [faceTransform, setFaceTransform] = useState<Matrix4>();
   const showHead = useQueryParam<"true" | "false">("head", "false") === "true";
-  const defaultModel = useQueryParam("model", "guyman.glb"); // thomas.glb
-  const defaultEnvironment = useQueryParam<PresetsType>("environment", "dawn"); // warehouse
+  const defaultModel = useQueryParam("model", "thomas.glb");
+  const defaultEnvironment = useQueryParam<PresetsType>(
+    "environment",
+    "studio"
+  );
   const [model, setModel] = useState<string>(defaultModel);
   const [environment, setEnvironment] =
     useState<PresetsType>(defaultEnvironment);
@@ -92,6 +95,20 @@ function App() {
 
     loadEnvironmentFiles();
   }, [environment]);
+
+  const switchHelmet = useCallback(() => {
+    if (model === "thomas.glb") {
+      setModel("guyman.glb");
+      setEnvironment("apartment");
+    } else if (model === "guyman.glb") {
+      setModel("thomas.glb");
+      setEnvironment("studio");
+    }
+  }, [model]);
+
+  useEffect(() => {
+    setInterval(switchHelmet, 10000);
+  }, [switchHelmet]);
 
   const goFullscreen = (element: HTMLElement) => {
     element.requestFullscreen();
