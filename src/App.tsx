@@ -152,18 +152,43 @@ function App() {
     video.requestVideoFrameCallback(videoFrameCallback);
   };
 
+  const [deviceId, setDeviceId] = useState({});
+
+  useEffect(() => {
+    async function chooseDevice() {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter(({ kind }) => kind === "videoinput");
+
+      const preferedCamera =
+        cameras?.find(({ label }) =>
+          label.toLowerCase().includes("facetime")
+        ) || cameras[0];
+
+      setDeviceId(preferedCamera.deviceId);
+    }
+
+    chooseDevice();
+  }, []);
+
   return (
     <div
       style={{ height: "100vh", width: "100%" }}
       onClick={(e) => goFullscreen(e.currentTarget)}
       ref={containerRef}
     >
-      <Webcam
-        style={{ width: "100%", height: "100%", objectFit: "contain" }}
-        ref={webcamRef}
-        videoConstraints={{ facingMode: "user", width: 640, height: 480 }}
-        onLoadedMetadata={(e) => ready(e.currentTarget)}
-      />
+      {deviceId && (
+        <Webcam
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          ref={webcamRef}
+          videoConstraints={{
+            deviceId,
+            facingMode: "user",
+            width: 640,
+            height: 480,
+          }}
+          onLoadedMetadata={(e) => ready(e.currentTarget)}
+        />
+      )}
       <Canvas camera={{ position: [0, 0, 0], fov: 60 }} ref={canvasRef}>
         {environmentFiles && (
           <Environment files={environmentFiles} background={false} />
