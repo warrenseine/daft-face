@@ -1,5 +1,5 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
-import { CameraControls, Environment, useGLTF } from "@react-three/drei";
+import { Environment, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { useEffect, useRef, useState } from "react";
@@ -77,13 +77,12 @@ function App() {
       ref={containerRef}
     >
       <Webcam
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
         ref={webcamRef}
         videoConstraints={{ facingMode: "user", width: 640, height: 480 }}
         onLoadedMetadata={(e) => ready(e.currentTarget)}
       />
       <Canvas camera={{ position: [0, 0, 0], fov: 60 }} ref={canvasRef}>
-        <CameraControls makeDefault />
         <Environment preset={environment} background={false} />
         {faceTransform && (
           <group matrix={faceTransform} matrixAutoUpdate={false}>
