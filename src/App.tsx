@@ -58,8 +58,11 @@ function App() {
   const faceLandmarkerRef = useRef<FaceLandmarker>();
   const [faceTransform, setFaceTransform] = useState<Matrix4>();
   const showHead = useQueryParam<"true" | "false">("head", "false") === "true";
-  const defaultModel = useQueryParam("model", "guyman.glb"); // thomas.glb
-  const defaultEnvironment = useQueryParam<PresetsType>("environment", "dawn"); // warehouse
+  const defaultModel = useQueryParam("model", "thomas.glb");
+  const defaultEnvironment = useQueryParam<PresetsType>(
+    "environment",
+    "studio"
+  );
   const [model, setModel] = useState<string>(defaultModel);
   const [environment, setEnvironment] =
     useState<PresetsType>(defaultEnvironment);
@@ -92,6 +95,16 @@ function App() {
 
     loadEnvironmentFiles();
   }, [environment]);
+
+  const switchHelmet = () => {
+    setModel((model: string) => model === "thomas.glb" ? "guyman.glb" : "thomas.glb")
+    setEnvironment((environment: string) => environment === "studio" ? "apartment" : "studio")
+  }
+
+  useEffect(() => {
+    const interval = setInterval(switchHelmet, 10000);
+    return () => clearInterval(interval)
+  }, []);
 
   const goFullscreen = (element: HTMLElement) => {
     element.requestFullscreen();
