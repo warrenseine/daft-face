@@ -10,6 +10,10 @@ import { useKey } from "react-use";
 import "./App.css";
 import { useQueryParam } from "./useQueryParam";
 
+interface Module {
+  default: string;
+}
+
 const supportedEnvironments: PresetsType[] = [
   "sunset",
   "dawn",
@@ -24,6 +28,11 @@ const supportedEnvironments: PresetsType[] = [
 ];
 
 const supportedModels = ["thomas.glb", "guyman.glb"];
+
+const modules = import.meta.glob<Module>(
+  "/node_modules/@pmndrs/assets/hdri/*.exr.js",
+  { eager: false }
+);
 
 const mod = (n: number, m: number): number => ((n % m) + m) % m;
 
@@ -49,6 +58,7 @@ function App() {
   const [model, setModel] = useState<string>(defaultModel);
   const [environment, setEnvironment] =
     useState<PresetsType>(defaultEnvironment);
+  const [environmentFiles, setEnvironmentFiles] = useState<Promise<Module>>();
 
   useKey("ArrowRight", () =>
     setEnvironment(
@@ -65,6 +75,18 @@ function App() {
   useKey("ArrowDown", () =>
     setModel((model) => previous(model, supportedModels))
   );
+
+  useEffect(() => {
+    async function loadEnvironmentFiles() {
+      if (supportedEnvironments.includes(environment)) {
+        const data =
+          modules[`/node_modules/@pmndrs/assets/hdri/${environment}.exr.js`]();
+        setEnvironmentFiles(data);
+      }
+    }
+
+    loadEnvironmentFiles();
+  }, [environment]);
 
   const goFullscreen = (element: HTMLElement) => {
     element.requestFullscreen();
@@ -125,7 +147,9 @@ function App() {
         onLoadedMetadata={(e) => ready(e.currentTarget)}
       />
       <Canvas camera={{ position: [0, 0, 0], fov: 60 }} ref={canvasRef}>
-        <Environment preset={environment} background={false} />
+        {environmentFiles && (
+          <Environment files={environmentFiles} background={false} />
+        )}
         {faceTransform && (
           <group matrix={faceTransform} matrixAutoUpdate={false}>
             <Helmet model={model} />
