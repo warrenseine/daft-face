@@ -8,6 +8,7 @@ import { PresetsType } from "@react-three/drei/helpers/environment-assets";
 import { useKey } from "react-use";
 import "./App.css";
 import { useQueryParam } from "./useQueryParam";
+import { Head } from "./Head";
 
 interface Module {
   default: string;
@@ -26,7 +27,12 @@ const supportedEnvironments: PresetsType[] = [
   "lobby",
 ];
 
-const supportedModels = ["thomas.glb", "guyman.glb"];
+const supportedModels = [
+  "thomas.glb",
+  "guyman.glb",
+  "apple_vision_pro_2023.glb",
+  "head.glb",
+];
 
 const modules = import.meta.glob<Module>(
   "/node_modules/@pmndrs/assets/hdri/*.exr.js",
@@ -151,6 +157,7 @@ function App() {
         )}
         {faceTransform && (
           <group matrix={faceTransform} matrixAutoUpdate={false}>
+            <Head visible={false} />
             <Helmet model={model} />
           </group>
         )}
