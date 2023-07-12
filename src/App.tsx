@@ -31,7 +31,6 @@ const supportedModels = [
   "thomas.glb",
   "guyman.glb",
   "apple_vision_pro_2023.glb",
-  "head.glb",
 ];
 
 const modules = import.meta.glob<Module>(
@@ -58,6 +57,7 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker>();
   const [faceTransform, setFaceTransform] = useState<Matrix4>();
+  const showHead = useQueryParam<"true" | "false">("head", "false") === "true";
   const defaultModel = useQueryParam("model", "guyman.glb"); // thomas.glb
   const defaultEnvironment = useQueryParam<PresetsType>("environment", "dawn"); // warehouse
   const [model, setModel] = useState<string>(defaultModel);
@@ -157,7 +157,7 @@ function App() {
         )}
         {faceTransform && (
           <group matrix={faceTransform} matrixAutoUpdate={false}>
-            <Head visible={false} />
+            <Head visible={showHead} />
             <Helmet model={model} />
           </group>
         )}

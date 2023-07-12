@@ -21,7 +21,7 @@ export function Head({ visible }: HeadProps) {
     gltfMaterial.opacity = 0.5;
   }, [gltf, visible]);
   // Scale head so ears don't appear over the helmet.
-  const scale = [0.8, 1.2, 1.2] as const
+  const scale = [0.8, 0.9, 1.0] as const
 
   return (
     <mesh scale={scale}>
