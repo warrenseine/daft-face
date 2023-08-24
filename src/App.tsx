@@ -67,6 +67,7 @@ function App() {
   const [environment, setEnvironment] =
     useState<PresetsType>(defaultEnvironment);
   const [environmentFiles, setEnvironmentFiles] = useState<Promise<Module>>();
+  const lastSeenRef = useRef(0)
 
   useKey("ArrowRight", () =>
     setEnvironment(
@@ -100,11 +101,6 @@ function App() {
     setModel((model: string) => model === "thomas.glb" ? "guyman.glb" : "thomas.glb")
     setEnvironment((environment: string) => environment === "studio" ? "apartment" : "studio")
   }
-
-  useEffect(() => {
-    const interval = setInterval(switchHelmet, 10000);
-    return () => clearInterval(interval)
-  }, []);
 
   const goFullscreen = (element: HTMLElement) => {
     element.requestFullscreen();
@@ -144,7 +140,14 @@ function App() {
     const transform = results.facialTransformationMatrixes?.[0];
 
     if (transform) {
+      lastSeenRef.current = timestamp
       setFaceTransform(new Matrix4().fromArray(transform.data));
+    } else {
+      setFaceTransform(undefined)
+      if (lastSeenRef.current > 0 && timestamp - lastSeenRef.current > 200) {
+        switchHelmet()
+        lastSeenRef.current = -1
+      }
     }
   };
 
